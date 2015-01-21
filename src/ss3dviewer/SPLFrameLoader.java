@@ -38,13 +38,13 @@ public class SPLFrameLoader {
         for (int i = 0; i < numrows; i++) {
             for (int j = 0; j < numcols; j++) {
                 System.out.print("i=" + i);
-                System.out.println(" j=" + j);
+                System.out.print(" j=" + j);
                 double Theta = Math.toRadians( (j - numcols/2.0)/(numcols/2.0)*xfov );
                 double Phi = Math.toRadians( (i - numrows/2.0)/(numrows/2.0)*yfov );
                 Short A = in.nextShort();
-                //System.out.print(" ampl=" + A);
+                System.out.print(" ampl=" + A);
                 Short R = in.nextShort();
-                //System.out.println(" range=" + R);
+                System.out.println(" range=" + R);
                 
                 double x = R*cos(Phi)*sin(Theta);
                 double y = R*sin(Phi);
@@ -91,7 +91,7 @@ public class SPLFrameLoader {
 //        return points;
 //    }
     public static void main(String[] args) {
-        File f = new File("C:\\Work\\temp\\java exam\\Ss3DViewer\\src\\ss3dviewer\\Frame0066");
+        File f = new File("C:\\Work\\temp\\java exam\\Ss3DViewer\\src\\ss3dviewer\\Frame0067");
 
 //        System.out.println(args[0]);
         try {
