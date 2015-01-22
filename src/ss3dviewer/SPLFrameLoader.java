@@ -17,39 +17,50 @@ import java.util.ArrayList;
  */
 public class SPLFrameLoader {
 
-    static final int imagesize = 32768;
-    static final int numrows = 128;
-    static final int numcols = 256;
-    static final double xfov = 40.0;
-    static final double yfov = 20.0;
+    // Ladar sensor constants
+    static final int imagesize = 32768;         // Size of image in pixels
+    static final int numrows = 128;             // Number of rows in frame
+    static final int numcols = 256;             // Number of columns in frame
+    static final double xfov = 40.0;            // Field of view in X (Horizontal)
+    static final double yfov = 20.0;            // Field of view in Y (vertical)
+    static final double delta_range = 0.00625;  // meters per range count
+    static final int araw_max = 1024;               // Max intenstiy (lower 10 bits of word)
+    static final int araw_min = 0;                  // Max intenstiy (lower 10 bits of word)
+    static final int rraw_max = 8192;               // Max Range (lower 13 bits of word)
+    static final int rraw_min = 0;                  // Min Range
 
+    // Data type of cloud
     private ArrayList<PointXYZI> cloud = new ArrayList<PointXYZI>(imagesize);
 
     public SPLFrameLoader(File framefile) throws IOException {
 
         BinaryReader in = new BinaryReader(framefile);
-        PointXYZI point1 = new PointXYZI(1.1, 1.2, 1.3, 100.7);
-        PointXYZI point2 = new PointXYZI(9.9, 8.8, 7.7, 98.7);
-//        PrintStream out = System.out;
-
-//        PointCloud cloud = new PointCloud();
 
         // load up raw frame data points
         for (int i = 0; i < numrows; i++) {
             for (int j = 0; j < numcols; j++) {
-                System.out.print("i=" + i);
-                System.out.print(" j=" + j);
-                double Theta = Math.toRadians( (j - numcols/2.0)/(numcols/2.0)*xfov );
-                double Phi = Math.toRadians( (i - numrows/2.0)/(numrows/2.0)*yfov );
-                Short A = in.nextShort();
-                System.out.print(" ampl=" + A);
-                Short R = in.nextShort();
-                System.out.println(" range=" + R);
+
+                double Theta = Math.toRadians((j - numcols / 2.0) / (numcols / 2.0) * xfov);
+                double Phi = Math.toRadians((i - numrows / 2.0) / (numrows / 2.0) * yfov);
+
+                // Read binary data from file
+                int A = clamp( in.nextUByte() + (in.nextUByte() << 8), araw_min, araw_max );    // read and clamp amplitude value
+                int R = clamp( in.nextUByte() + (in.nextUByte() << 8), rraw_min, rraw_max );    // read and camp range value
                 
-                double x = R*cos(Phi)*sin(Theta);
-                double y = R*sin(Phi);
-                double z = R*cos(Phi)*cos(Theta);
-                
+//                int A = in.nextUByte() + (in.nextUByte() << 8);    // read and clamp amplitude value
+//                int R = in.nextUByte() + (in.nextUByte() << 8);    // read and camp range value
+               
+                // Convert raw binary to Ampl and Range
+                double Range = R * delta_range;                  // Convert range to meters
+                double Amplitude = (double) A / araw_max;        // Normalize amplitude to be 0-1
+
+                // Convert polar to xyz
+                double x = Range * cos(Phi) * sin(Theta);
+                double y = Range * sin(Phi);
+                double z = Range * cos(Phi) * cos(Theta);
+
+                System.out.println("i=" + i + " j=" + j + " ampl=" + Amplitude + " range=" + Range + " x=" + x + " y=" + y + " z=" + z);
+
                 PointXYZI point = new PointXYZI(x, y, z, A);
                 this.cloud.add(point);
             }
@@ -58,12 +69,12 @@ public class SPLFrameLoader {
         System.out.printf("ArrayList Size = %d\n", this.cloud.size());
 
     }
-    
+
     //[i, j, R, I] to [x, y, z, I] converter
     private void PolartoXYZIConverter() {
-        
-         short ampl;
-         short range;
+
+        short ampl;
+        short range;
 
         for (int i = 1; i < numrows; i++) {
             System.out.println("i is: " + i);
@@ -71,25 +82,13 @@ public class SPLFrameLoader {
                 System.out.println("j is: " + i);
             }
         }
-        
+
     }
 
-//    private ArrayList<PointXYZI> LoadPoints(FileInputStream in, ArrayList<PointXYZI> points) {
-//
-//        int c;
-//        
-//        try {
-//            while ((c = in.read()) != -1) {
-//                points.add(c);
-//            }
-//        }finally {
-//            if (in != null) {
-//                in.close();
-//            }
-//        }
-//        
-//        return points;
-//    }
+    public static int clamp(int val, int min, int max) {
+        return Math.max(min, Math.min(max, val));
+    }
+
     public static void main(String[] args) {
         File f = new File("C:\\Work\\temp\\java exam\\Ss3DViewer\\src\\ss3dviewer\\Frame0067");
 

@@ -136,6 +136,24 @@ public class BinaryReader {
             return 0;
         }
     }
+    
+    public int nextUShort() {
+        try {
+            return this.in.readUnsignedShort();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
+    
+    public int nextUByte() {
+        try {
+            return this.in.readUnsignedByte();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            return 0;
+        }
+    }
 
     public boolean nextBoolean() {
         try {

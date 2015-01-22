@@ -5,15 +5,21 @@
  */
 package ss3dviewer;
 
+import java.util.ArrayList;
+import static ss3dviewer.SPLSensorConstants.*;
+
+
 /**
  *
  * @author rmoss
  */
-public class PointCloud {
+public class PointCloud extends ArrayList {
 
+    private ArrayList<PointXYZI> cloud;
+    //int size;
     
-    public PointCloud(){
-        
+    public PointCloud(int s){
+        this.cloud = new ArrayList<PointXYZI>(s);
     }
     
 }
