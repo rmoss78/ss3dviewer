@@ -16,10 +16,11 @@ import static ss3dviewer.SPLSensorConstants.*;
 public class PointCloud extends ArrayList {
 
     private ArrayList<PointXYZI> cloud;
-    //int size;
+    int size;
     
     public PointCloud(int s){
-        this.cloud = new ArrayList<PointXYZI>(s);
+//        this.cloud = new ArrayList<PointXYZI>(s);
+        this.size = s;
     }
     
 }
